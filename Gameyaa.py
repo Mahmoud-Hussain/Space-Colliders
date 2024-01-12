@@ -2,8 +2,8 @@ import pygame
 import os
 import random
 pygame.font.init()
-# initiallize pygame's library
 pygame.init() 
+pygame.mixer.init()
 
 WIDTH, HEIGHT= 800,600
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -24,6 +24,9 @@ MAX_BULLETS = 3
 WHITE = (255,255,255)
 RED = (255,0,0) 
 YELLOW = (255,255,0)
+
+
+BULLET_SHOOT_SOUND = pygame.mixer.Sound(os.path.join('Assets', 'shotgun-firing-4-6746.mp3'))
 
 health_font = pygame.font.SysFont('comicsans',40 )
 winner_font = pygame.font.SysFont('comicsans', 100)
@@ -89,86 +92,93 @@ def draw_Window(red,yellow,red_bullets, yellow_bullets, red_health, yellow_healt
     
     pygame.display.update()
 
-def movement_yellow(yellow):
+def movement_yellow(yellow):  
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT] and yellow.x - SPACESHIP_VEL > 0:
+    if keys[pygame.K_a] and yellow.x > 0 :
         yellow.x -= SPACESHIP_VEL  
-    if keys[pygame.K_RIGHT] and yellow.x < WIDTH//2 - SpaceShip_Width - 10:
+    if keys[pygame.K_d] and yellow.x < WIDTH/2 -SpaceShip_Width-  10:
         yellow.x += SPACESHIP_VEL  
-    if keys[pygame.K_UP] and yellow.y - SPACESHIP_VEL > 0:
+    if keys[pygame.K_w] and yellow.y > 0:
         yellow.y -= SPACESHIP_VEL 
-    if keys[pygame.K_DOWN] and yellow.y < HEIGHT - SpaceShip_Height:
+    if keys[pygame.K_s] and yellow.y < HEIGHT - SpaceShip_Height:
         yellow.y += SPACESHIP_VEL  
 
 def movement_red(red):
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_a] and red.x > WIDTH/2 + 10:
+    if keys[pygame.K_LEFT] and red.x > WIDTH/2 + 10:
         red.x -= SPACESHIP_VEL  
-    if keys[pygame.K_d] and red.x < WIDTH - SpaceShip_Width - 8:
+    if keys[pygame.K_RIGHT] and red.x < WIDTH - SpaceShip_Width - 8:
         red.x += SPACESHIP_VEL  
-    if keys[pygame.K_w] and red.y - SPACESHIP_VEL > 0:
+    if keys[pygame.K_UP] and red.y - SPACESHIP_VEL > 0:
         red.y -= SPACESHIP_VEL 
-    if keys[pygame.K_s] and red.y < HEIGHT - SpaceShip_Height:
-        red.y += SPACESHIP_VEL  
+    if keys[pygame.K_DOWN] and red.y  < HEIGHT - SpaceShip_Height:
+        red.y += SPACESHIP_VEL
 
 def define_winner(text):
     draw_text = winner_font.render(text, 1, WHITE)
     SCREEN.blit(draw_text, (WIDTH/2 - draw_text.get_width() / 
-                            2, HEIGHT/2 - draw_text.get_width()/2))
+                            2, HEIGHT/2 - draw_text.get_width()/5))
     pygame.display.update()
-    pygame.time.delay(5000)
+    
+
 
 def main():
-    yellow = pygame.Rect(145, 100, SpaceShip_Width, SpaceShip_Height)
-    red = pygame.Rect(545, 100, SpaceShip_Width, SpaceShip_Height)
-    
-    red_bullets = []
-    yellow_bullets = []
-    
-    red_health = 10
-    yellow_health = 10
-    
-    clock = pygame.time.Clock()
     run = True
     while run:
-        clock.tick(FPS)
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-                pygame.quit()
-                
-            
-            if event.type == pygame.KEYDOWN :
-                if event.key == pygame.K_l and len(yellow_bullets) < MAX_BULLETS:
-                    bullet = pygame.Rect(yellow.x + yellow.width, yellow.y + yellow.height//2 -2, 10, 5 )
-                    yellow_bullets.append(bullet)
-                if event.key == pygame.K_v and len(red_bullets) < MAX_BULLETS:
-                    bullet = pygame.Rect(red.x, red.y + red.height//2 -2, 10, 5 )
-                    red_bullets.append(bullet)
-        
-            if event.type == red_hit:
-                red_health -= 1 
-            if event.type == yellow_hit:
-                yellow_health -= 1 
-               
-            winner_text = "" 
-            if red_health <=0 :
-                winner_text = "Yellow wins!"
-            if yellow_health <=0 :
-                winner_text = "Red wins!"
-            if winner_text != "" :
-                define_winner(winner_text)
-                break
-            
-        handle_bullets(yellow_bullets, red_bullets, yellow, red)
-        
-        draw_Window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_health)
-        movement_yellow(yellow)  
-        movement_red(red)   
-        
-    main()
-    
+        yellow = pygame.Rect(145, 100, SpaceShip_Width, SpaceShip_Height)
+        red = pygame.Rect(545, 100, SpaceShip_Width, SpaceShip_Height)
+
+        red_bullets = []
+        yellow_bullets = []
+
+        red_health = 10
+        yellow_health = 10
+
+        clock = pygame.time.Clock()
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
+                    pygame.quit()
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_v and len(yellow_bullets) < MAX_BULLETS:
+                        bullet = pygame.Rect(yellow.x + yellow.width, yellow.y + yellow.height // 2 - 2, 10, 5)
+                        yellow_bullets.append(bullet)
+                        BULLET_SHOOT_SOUND.play()
+                    if event.key == pygame.K_SLASH and len(red_bullets) < MAX_BULLETS:
+                        bullet = pygame.Rect(red.x, red.y + red.height // 2 - 2, 10, 5)
+                        red_bullets.append(bullet)
+                        BULLET_SHOOT_SOUND.play()
+
+                if event.type == red_hit:
+                    red_health -= 1
+                if event.type == yellow_hit:
+                    yellow_health -= 1
+
+                winner_text = ""
+                if red_health <= 0:
+                    winner_text = "Yellow wins!"
+
+                if yellow_health <= 0:
+                    winner_text = "Red wins!"
+
+                if winner_text != "":
+                    define_winner(winner_text)
+                    pygame.time.delay(5000)
+                    break  # Exit the event loop when the game ends
+
+            handle_bullets(yellow_bullets, red_bullets, yellow, red)
+
+            draw_Window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_health)
+            movement_yellow(yellow)
+            movement_red(red)
+
+            clock.tick(FPS)
+
+            if winner_text != "":
+                break  # Exit the game loop when the game ends
+
 if __name__ == "__main__":
-    main() 
-       
+    main()
