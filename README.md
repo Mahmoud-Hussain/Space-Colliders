@@ -65,4 +65,4 @@
 
  Enjoy the game and happy coding! 🚀🎮
 
-## [GD4B Bangla Resource on GameLoop and pygame](https://github.com/Mahmoud-Hussain/Space-Colliders)
+## (https://github.com/Mahmoud-Hussain/Space-Colliders)
