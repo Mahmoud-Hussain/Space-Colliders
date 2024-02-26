@@ -18,7 +18,7 @@
 
 ### 2. Scoring and Health System
 - Earn points for destroying enemies.
-- Player health decreases upon collisions with enemies.
+- Player health decreases upon collisions with enemie's bullets.
 
 ### 3. Sound and Graphics
 - Utilizes Pygame for sound effects and image rendering.
